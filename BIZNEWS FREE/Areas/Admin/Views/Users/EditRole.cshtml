@@ -1,0 +1,38 @@
+﻿@using BIZNEWS_FREE.Models
+@model User
+@inject Microsoft.AspNetCore.Identity.UserManager<User> _userManager;
+
+@{
+    var count = 0;
+    var roles = await _userManager.GetRolesAsync(Model);
+}
+
+<dl>
+    <dt>Firstname Lastname</dt>
+    <dd>@Model.Firstname @Model.Lastname</dd>
+    <dt>Email</dt>
+    <dd>@Model.Email</dd>
+</dl>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>Role</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in roles)
+        {
+            count++;
+            <tr>
+                <td>@count</td>
+                <td>@item</td>
+                <td>
+                    <a asp-area="Admin" asp-controller="Users" asp-action="DeleteRole" asp-route-userId="@Model.Id" asp-route-role="@item" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

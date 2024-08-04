@@ -1,0 +1,59 @@
+﻿@model List<User>
+@inject Microsoft.AspNetCore.Identity.UserManager<User> _userManager;
+
+@{
+    int counter = 0;
+}
+
+<!-- Форма поиска -->
+<form method="get" asp-action="Index" asp-controller="Users" asp-area="Admin">
+    <div class="form-group">
+        <label for="searchUser">Search by Name or Email:</label>
+        <input type="text" name="searchUser" class="form-control" value="@Context.Request.Query["searchUser"].ToString()" />
+    </div>
+    <button type="submit" class="btn btn-dark">Search</button>
+    <button type="button" class="btn btn-dark" onclick="clearAndRefresh()">Clear</button>
+</form>
+
+<script>
+    function clearAndRefresh() {
+        document.querySelector('input[name="searchUser"]').value = '';
+        window.location.href = '@Url.Action("Index", "Users", new { area = "Admin" })';
+    }
+</script>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Roles</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            counter++;
+            <tr>
+                <td>@counter</td>
+                <td>@item.Email</td>
+                <td>@item.Firstname</td>
+                <td>
+                    @{
+                        var roles = await _userManager.GetRolesAsync(item);
+                    }
+                    @foreach (var role in roles)
+                    {
+                        @role <span>/</span>
+                    }
+                </td>
+                <td>
+                    <a asp-area="Admin" asp-controller="Users" asp-action="AddRole" asp-route-userId="@item.Id" class="btn btn-success">Add Role</a>
+                    <a asp-area="Admin" asp-controller="Users" asp-action="EditRole" asp-route-userId="@item.Id" class="btn btn-warning">Edit Role</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

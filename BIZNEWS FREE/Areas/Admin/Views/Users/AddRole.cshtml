@@ -1,0 +1,17 @@
+﻿@using BIZNEWS_FREE.Areas.Admin.ViewModels
+@model UserVM
+
+<form method="post">
+	<div class="form-group">
+		<select class="form-control" name="role" >		  
+			@foreach (var item in Model.Roles)
+			{
+				<option>@item</option>
+			}
+		</select>
+
+		<input type="submit" value="Add" class="btn btn-success" />
+
+	</div>
+
+</form>

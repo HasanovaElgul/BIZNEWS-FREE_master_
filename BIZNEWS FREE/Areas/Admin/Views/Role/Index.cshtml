@@ -1,0 +1,28 @@
+﻿@using System.Diagnostics.Metrics
+@model List<Microsoft.AspNetCore.Identity.IdentityRole>
+
+
+
+<a href="/admin/role/create" class="btn btn-dark">Create</a>
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+            </tr>
+           
+        }
+    </tbody>                                   
+</table>
+                                                                                       
+
+                                                                                 

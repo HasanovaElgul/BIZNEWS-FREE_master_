@@ -1,0 +1,14 @@
+﻿
+
+@model Category
+
+<form method="post" asp-action="Delete">
+    <div class="form-group">
+        <label asp-for="CategoryName">Category name</label>
+        <input type="text" asp-for="CategoryName" value="@Model.CategoryName" class="form-control" disabled />
+        <span asp-validation-for="CategoryName" class="text-danger"></span>
+    </div>
+
+    <input type="hidden" asp-for="Id" />
+    <input type="submit" class="btn btn-danger" value="Delete" onclick="return confirm('Are you sure you want to delete this category?');" />
+</form>

@@ -1,0 +1,33 @@
+﻿@model List<Tag>
+@{
+	int counter = 0;
+}
+
+<a href="/admin/tag/create"class=" btn btn-success">Create</a>
+<table class=" table table-dark table-hover table-striped table-bordered">
+	<thead>
+		<tr>
+			<th>№</th>
+			<th>Name</th>
+			<th>Action</th>
+
+		</tr>
+
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			counter++;
+			<tr>
+				<td>@counter</td>
+				<td>@item.TagName</td>
+				<td>
+					<a href="/admin/tag/edit/@item.Id" class="btn btn-warning">Edit</a>
+					<a href="/admin/tag/delete/@item" class="btn btn-danger">Delete</a>
+				</td>
+			</tr>
+		}
+
+	</tbody>
+
+</table>

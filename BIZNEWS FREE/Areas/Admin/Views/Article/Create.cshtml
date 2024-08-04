@@ -1,0 +1,65 @@
+﻿@model Article
+
+<form method="post" enctype="multipart/form-data">
+    <!-- Формируем группу для ввода заголовка статьи --> <!--   fayl yuklemek ucun   -->
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <input type="text" asp-for="Title" class="form-control" value="" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <!-- Формируем группу для ввода содержания статьи -->
+    <div class="form-group">
+        <label asp-for="Content"></label>
+        <textarea asp-for="Content" class="form-control"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    <!-- Формируем группу для выбора категории статьи -->
+    <div class="form-group">
+        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-control">
+            <option>Select category</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    <!-- Формируем группу для выбора тегов статьи -->
+    <div class="form-group">
+        <select multiple name="tagIds" class="form-control">
+            
+            @foreach (var item in ViewData["tags"] as List<Tag>)            //bura gonderdiym data list tipinden gelsin
+            {
+            <option value="@item.Id">@item.TagName</option>
+            }
+           
+        </select>
+
+    </div>
+
+
+
+    <!-- Этот input используется для загрузки фотографий -->
+    <!--IsFeature önə çıxan xəbərlər --><!--İsActive saytda çıxan xəbərlər hamisi-->
+
+    <div class="form-group">
+        <input type="file" accept="image/*" name="file" class="form-control" value="" />            <!--istenilen sekil yukleye biler -->
+        <span asp-validation-for="PhotoUrl" class="text-danger"></span>
+    </div>
+
+    <!-- Показать дополнительные опции для определенных ролей пользователей -->
+    @if (User.IsInRole("Admin editor") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("Manager"))
+    {
+<div class="form-group">
+            <input type="checkbox" asp-for="IsActive" class="form-check-label" />
+           <label asp-for="IsActive"></label>
+       </div>
+       <div class="form-group">
+           
+            <input type="checkbox" asp-for="IsFeature" class="form-check-label" />
+            <label asp-for="IsFeature"></label>
+        </div>
+    }
+    <!-- Кнопка для отправки формы -->
+
+    <input type="submit" class="btn btn-dark" value="Create" />
+
+
+
+</form>

@@ -1,0 +1,17 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityRole
+
+@{
+    if (ViewData["Error"] != null)
+    {
+        <span class="alert alert-danger">@ViewData["Error"]</span>
+    }
+}
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input type="text" asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <input type="submit" value="Create" class="btn btn-success" />
+</form>
