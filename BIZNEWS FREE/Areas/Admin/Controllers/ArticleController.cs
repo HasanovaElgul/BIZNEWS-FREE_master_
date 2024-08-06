@@ -1,9 +1,11 @@
 ﻿using BIZNEWS_FREE.Data;
+using BIZNEWS_FREE.Helpers;
 using BIZNEWS_FREE.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BIZNEWS_FREE.Areas.Admin.Controllers
@@ -31,7 +33,10 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
         // Метод для отображения списка статей
         public IActionResult Index()
         {
-            var articles = _context.Articles.ToList(); // Получение списка статей из базы данных
+            var articles = _context.Articles
+                .Include(x => x.Category)
+                .Include(x => x.ArticleTags)
+                .ThenInclude(x => x.Tag).ToList(); // Получение списка статей из базы данных
             return View(articles);
         }
 
@@ -74,12 +79,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
                 // Формирование пути для сохранения файла
                 if (file != null)
                 {
-                    var path = Path.Combine("/uploads/", Guid.NewGuid() + Path.GetExtension(file.FileName));
-                    using (FileStream fileStream = new(Path.Combine(_env.WebRootPath, path), FileMode.Create))
-                    {
-                        await file.CopyToAsync(fileStream);
-                    }
-                    newArticle.PhotoUrl = path;
+                    newArticle.PhotoUrl = await file.SaveFileAsync(_env.WebRootPath);        //helpers была создана папка информцию получаем оттуда
                 }
                 else
                 {
