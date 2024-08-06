@@ -19,7 +19,17 @@
         {
             
             <tr>
-                
+                <td>@item.Id</td>
+                <td>@item.Title</td>
+                <td>@item.Category.CategoryName</td>
+                <td>
+                    @foreach (var tag in item.ArticleTags)
+                    {
+                        <span>
+                            @tag.Tag.TagName
+                        </span>
+                    }
+                </td>
             </tr>
         }
     </tbody>

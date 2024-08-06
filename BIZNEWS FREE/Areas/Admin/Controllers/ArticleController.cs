@@ -1,5 +1,6 @@
 ﻿using BIZNEWS_FREE.Data;
 using BIZNEWS_FREE.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,30 +9,35 @@ using System.Security.Claims;
 namespace BIZNEWS_FREE.Areas.Admin.Controllers
 {
     [Area(nameof(Admin))]
+    [Authorize]
     public class ArticleController : Controller
     {
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _env;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<ArticleController> _logger;
 
-        public ArticleController(AppDbContext context, IWebHostEnvironment env, IHttpContextAccessor contextAccessor, UserManager<User> userManager)
+        // Конструктор контроллера. Зависимости внедряются через конструктор.
+        public ArticleController(AppDbContext context, IWebHostEnvironment env, IHttpContextAccessor contextAccessor, UserManager<User> userManager, ILogger<ArticleController> logger)
         {
             _context = context;
             _env = env;
             _contextAccessor = contextAccessor;
             _userManager = userManager;
+            _logger = logger;
         }
 
-        // GET: /Admin/Article/Index
+        // Метод для отображения списка статей
         public IActionResult Index()
         {
             var articles = _context.Articles.ToList(); // Получение списка статей из базы данных
             return View(articles);
         }
 
-        // GET: /Admin/Article/Create
+        // Метод для отображения формы создания новой статьи
         [HttpGet]
+        [Authorize]
         public IActionResult Create()
         {
             var categories = _context.Categories.ToList();
@@ -42,103 +48,86 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: /Admin/Article/Create
+        // Метод для обработки отправки формы создания новой статьи
         [HttpPost]
         [ValidateAntiForgeryToken] // Проверяет наличие и правильность токена
         public async Task<IActionResult> Create(Article article, IFormFile file, List<int> tagIds)
         {
-            var categories = _context.Categories.ToList();
-            var tags = _context.Tags.ToList();
-            ViewData["tags"] = tags; // Передаем список тегов в представление
-            ViewBag.Categories = new SelectList(categories, "Id", "CategoryName"); // Создаем SelectList для категорий
-
-            if (file == null || file.Length == 0)
-            {
-                ModelState.AddModelError("", "Выберите файл для загрузки.");
-                return View(article);
-            }
-
-            // Проверка контекста и пользователя
-            var user = _contextAccessor.HttpContext?.User;
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
-            var currentUser = await _userManager.FindByIdAsync(userId);
-            if (currentUser == null)
-            {
-                return Unauthorized();
-            }
-
-            var path = Path.Combine("uploads", Guid.NewGuid() + Path.GetFileName(file.FileName));
-            var fullPath = Path.Combine(_env.WebRootPath, path);
-
             try
             {
-                var directory = Path.GetDirectoryName(fullPath);
-                if (!Directory.Exists(directory))
+                var categories = _context.Categories.ToList();
+                var tags = _context.Tags.ToList();
+                ViewData["tags"] = tags; // Передаем список тегов в представление
+                ViewBag.Categories = new SelectList(categories, "Id", "CategoryName"); // Создаем SelectList для категорий
+
+                var userId = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
                 {
-                    Directory.CreateDirectory(directory);
+                    // Обработка случая, когда пользователь не найден
+                    ModelState.AddModelError("", "Пользователь не найден");
+                    return View();
                 }
 
-                using (var fileStream = new FileStream(fullPath, FileMode.Create))
+                Article newArticle = new();
+
+                // Формирование пути для сохранения файла
+                if (file != null)
                 {
-                    await file.CopyToAsync(fileStream);
+                    var path = Path.Combine("/uploads/", Guid.NewGuid() + Path.GetExtension(file.FileName));
+                    using (FileStream fileStream = new(Path.Combine(_env.WebRootPath, path), FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+                    newArticle.PhotoUrl = path;
                 }
-            }
-            catch (Exception ex)
-            {
-                // Логирование ошибки загрузки файла
-                // Предполагается, что у вас есть настроенный ILogger
-                // _logger.LogError(ex, "Ошибка при загрузке файла.");
-                ModelState.AddModelError("", "Произошла ошибка при загрузке файла.");
-                return View(article);
-            }
+                else
+                {
+                    ModelState.AddModelError("", "Файл не выбран");
+                    return View();
+                }
 
-            var newArticle = new Article
-            {
-                PhotoUrl = path,
-                Title = article.Title,
-                Content = article.Content,
-                CreatedDate = DateTime.Now,
-                CategoryId = article.CategoryId,
-                IsActive = article.IsActive,
-                IsFeature = article.IsFeature,
-                CreatedBy = $"{currentUser.Firstname} {currentUser.Lastname}"
-            };
+                // Создание новой статьи        
+                newArticle.Title = article.Title;
+                newArticle.Content = article.Content;
+                newArticle.CreatedDate = DateTime.Now;
+                newArticle.CategoryId = article.CategoryId;
+                newArticle.IsActive = article.IsActive;
+                newArticle.IsFeature = article.IsFeature;
+                newArticle.CreatedBy = $"{user.Firstname} {user.Lastname}";
+                newArticle.SeoUrl = "";
 
-            try
-            {
+                // Сохранение статьи в базе данных
                 await _context.Articles.AddAsync(newArticle);
                 await _context.SaveChangesAsync();
 
+                // Добавление тегов к статье
                 foreach (var tagId in tagIds)
                 {
-                    var articleTag = new ArticleTag
+                    ArticleTag articleTag = new()
                     {
                         ArticleId = newArticle.Id,
                         TagId = tagId
                     };
-                    await _context.ArticleTags.AddAsync(articleTag);
+                    _context.ArticleTags.Add(articleTag);
                 }
                 await _context.SaveChangesAsync();
+
+                // Логирование успешного создания статьи
+                _logger.LogInformation("Статья {Title} успешно создана пользователем {User}", newArticle.Title, user.Email);
+
+                // Перенаправление на страницу списка статей после успешного создания
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                // Логирование ошибки сохранения статьи
-                // _logger.LogError(ex, "Ошибка при сохранении статьи.");
-                ModelState.AddModelError("", "Произошла ошибка при сохранении статьи.");
-                return View(article);
-            }
+                // Логирование ошибки
+                _logger.LogError(ex, "Ошибка при создании статьи");
 
-            return RedirectToAction(nameof(Index));
+                // Обработка ошибки и возврат представления с сообщением об ошибке
+                ModelState.AddModelError("", "Произошла ошибка при создании статьи");
+                return View();
+            }
         }
     }
 }

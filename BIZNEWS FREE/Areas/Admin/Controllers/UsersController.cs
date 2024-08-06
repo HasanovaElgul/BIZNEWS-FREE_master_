@@ -32,6 +32,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> AddRole(string userId)
         {
             var findUser = await _userManager.FindByIdAsync(userId);

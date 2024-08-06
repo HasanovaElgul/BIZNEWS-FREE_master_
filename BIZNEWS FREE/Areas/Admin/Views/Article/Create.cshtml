@@ -33,13 +33,13 @@
         </select>
     </div>
 
-    <!-- Поле для загрузки файла, accept="image/* пощволяет выбирать только изображения JPEG, PNG, GIF и т.д -->
+    <!-- Поле для загрузки файла -->
     <div class="form-group">
-        <input type="file" accept="image/*" name="file" class="form-control" />               
+        <input type="file" accept="image/*" name="file" class="form-control" value="" />
         <span asp-validation-for="PhotoUrl" class="text-danger"></span>
     </div>
 
-    <!-- Отображаем опции для определенных ролей пользователей -->
+    <!-- Опции для определенных ролей пользователей -->
     @if (User.IsInRole("Admin editor") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("Manager"))
     {
         <div class="form-group">
