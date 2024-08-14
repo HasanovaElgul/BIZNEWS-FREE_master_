@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 using System.Security.Claims;
 
 namespace BIZNEWS_FREE.Areas.Admin.Controllers
@@ -79,7 +80,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
                 // Формирование пути для сохранения файла
                 if (file != null)
                 {
-                    newArticle.PhotoUrl = await file.SaveFileAsync(_env.WebRootPath);        //helpers была создана папка информцию получаем оттуда
+                    newArticle.PhotoUrl = path;        //helpers была создана папка информцию получаем оттуда
                 }
                 else
                 {
