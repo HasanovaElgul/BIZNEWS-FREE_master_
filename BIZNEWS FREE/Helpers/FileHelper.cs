@@ -2,7 +2,7 @@
 {
     public static class FileHelper
     {
-        public static async  Task<string> SaveFileAsync(IFormFile file, string WebRootPath)
+        public static async  Task<string> SaveFileAsync(this IFormFile file, string WebRootPath)
         {
             string path = Path.Combine("/uploads/", Guid.NewGuid() + file.FileName);
             using FileStream fileStream = new(WebRootPath + path, FileMode.Create);
