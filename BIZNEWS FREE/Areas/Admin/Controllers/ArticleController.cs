@@ -57,7 +57,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken] // Проверяет наличие и правильность токена
         public async Task<IActionResult> Create(Article article, IFormFile file, List<int> tagIds)
-        {
+      {
             try
             {
                 var categories = _context.Categories.ToList();
@@ -81,7 +81,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
                 if (file != null)
                 {
 
-                    newArticle.PhotoUrl = await file.SaveFileAsync(_env.WebRootPath);        //helpers была создана папка информцию получаем оттуда
+                    newArticle.PhotoUrl = await file.SaveFileAsync(_env.WebRootPath, "article-images");        //helpers была создана папка информцию получаем оттуда
                 }
                 else
                 {
