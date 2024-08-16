@@ -11,16 +11,16 @@ using System.Security.Claims;
 namespace BIZNEWS_FREE.Areas.Admin.Controllers
 {
     [Area(nameof(Admin))]
-    [Authorize]
+    [Authorize] // Требует аутентификации для доступа к методам контроллера
     public class ArticleController : Controller
     {
-        private readonly AppDbContext _context;
-        private readonly IWebHostEnvironment _env;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly UserManager<User> _userManager;
-        private readonly ILogger<ArticleController> _logger;
+        private readonly AppDbContext _context; // Контекст базы данных
+        private readonly IWebHostEnvironment _env; // Среда веб-хостинга
+        private readonly IHttpContextAccessor _contextAccessor; // Доступ к текущему контексту HTTP
+        private readonly UserManager<User> _userManager; // Управление пользователями
+        private readonly ILogger<ArticleController> _logger; // Логирование
 
-        // Конструктор контроллера. Зависимости внедряются через конструктор.
+        // Конструктор контроллера. Зависимости внедряются через конструктор.                                                 
         public ArticleController(AppDbContext context, IWebHostEnvironment env, IHttpContextAccessor contextAccessor, UserManager<User> userManager, ILogger<ArticleController> logger)
         {
             _context = context;
@@ -33,10 +33,14 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
         // Метод для отображения списка статей
         public IActionResult Index()
         {
+            // Получение списка статей из базы данных с включением связанных категорий и тегов
             var articles = _context.Articles
-                .Include(x => x.Category)
-                .Include(x => x.ArticleTags)
-                .ThenInclude(x => x.Tag).ToList(); // Получение списка статей из базы данных
+                .Include(x => x.Category) // Включаем связанные категории
+                .Include(x => x.ArticleTags) // Включаем связанные теги
+                .ThenInclude(x => x.Tag) // Включаем сами теги
+                .ToList();
+
+            // Передаем список статей в представление
             return View(articles);
         }
 
@@ -45,68 +49,75 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
         [Authorize]
         public IActionResult Create()
         {
+            // Получаем список категорий и тегов из базы данных
             var categories = _context.Categories.ToList();
             var tags = _context.Tags.ToList();
-            ViewData["tags"] = tags; // Передаем список тегов в представление
-            ViewBag.Categories = new SelectList(categories, "Id", "CategoryName"); // Создаем SelectList для категорий
+
+            // Передаем список тегов в представление
+            ViewData["tags"] = tags;
+
+            // Создаем SelectList для категорий и передаем его в представление
+            ViewBag.Categories = new SelectList(categories, "Id", "CategoryName");
 
             return View();
         }
 
         // Метод для обработки отправки формы создания новой статьи
         [HttpPost]
-        [ValidateAntiForgeryToken] // Проверяет наличие и правильность токена
+        [ValidateAntiForgeryToken] // Проверяет наличие и правильность токена для предотвращения CSRF атак
         public async Task<IActionResult> Create(Article article, IFormFile file, List<int> tagIds)
-      {
+        {
             try
             {
-                var categories = _context.Categories.ToList();
-                var tags = _context.Tags.ToList();
-                ViewData["tags"] = tags; // Передаем список тегов в представление
-                ViewBag.Categories = new SelectList(categories, "Id", "CategoryName"); // Создаем SelectList для категорий
+                // Загрузка данных категорий и тегов для использования в представлении
+                LoadCategoriesAndTags();
 
+                // Получение идентификатора текущего пользователя
                 var userId = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user == null)
+                if (userId == null)
                 {
-                    // Обработка случая, когда пользователь не найден
                     ModelState.AddModelError("", "Пользователь не найден");
                     return View();
                 }
 
-                Article newArticle = new();
-
-
-                // Формирование пути для сохранения файла
-                if (file != null)
+                // Поиск пользователя по его идентификатору
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
                 {
-
-                    newArticle.PhotoUrl = await file.SaveFileAsync(_env.WebRootPath, "article-images");        //helpers была создана папка информцию получаем оттуда
+                    ModelState.AddModelError("", "Пользователь не найден");
+                    return View();
                 }
-                else
+
+                // Проверка, был ли выбран файл
+                if (file == null || file.Length == 0)
                 {
                     ModelState.AddModelError("", "Файл не выбран");
                     return View();
                 }
 
-                // Создание новой статьи        
-                newArticle.Title = article.Title;
-                newArticle.Content = article.Content;
-                newArticle.CreatedDate = DateTime.Now;
-                newArticle.CategoryId = article.CategoryId;
-                newArticle.IsActive = article.IsActive;
-                newArticle.IsFeature = article.IsFeature;
-                newArticle.CreatedBy = $"{user.Firstname} {user.Lastname}";
-                newArticle.SeoUrl = "";
+                // Создание нового объекта статьи
+                var newArticle = new Article
+                {
+                    Title = article.Title,
+                    Content = article.Content,
+                    CreatedDate = DateTime.Now,
+                    CategoryId = article.CategoryId,
+                    IsActive = article.IsActive,
+                    IsFeature = article.IsFeature,
+                    CreatedBy = $"{user.Firstname} {user.Lastname}",
+                    SeoUrl = "", // Замените на логику генерации SEO URL
+                    PhotoUrl = await file.SaveFileAsync(_env.WebRootPath, "article-images") // Сохранение загруженного файла
+                };
 
-                // Сохранение статьи в базе данных
+                // Добавление новой статьи в базу данных
                 await _context.Articles.AddAsync(newArticle);
                 await _context.SaveChangesAsync();
 
-                // Добавление тегов к статье
-                foreach (var tagId in tagIds)
+                // Проверка существующих тегов и добавление их к статье
+                var validTagIds = _context.Tags.Where(t => tagIds.Contains(t.Id)).Select(t => t.Id).ToList();
+                foreach (var tagId in validTagIds)
                 {
-                    ArticleTag articleTag = new()
+                    var articleTag = new ArticleTag
                     {
                         ArticleId = newArticle.Id,
                         TagId = tagId
@@ -123,13 +134,29 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                // Логирование ошибки
-                _logger.LogError(ex, "Ошибка при создании статьи");
-
-                // Обработка ошибки и возврат представления с сообщением об ошибке
+                // Логирование ошибки и отображение сообщения об ошибке
+                _logger.LogError(ex, "Ошибка при создании статьи: {Message}", ex.Message);
                 ModelState.AddModelError("", "Произошла ошибка при создании статьи");
                 return View();
             }
+        }
+
+        // Метод для загрузки категорий и тегов
+        private void LoadCategoriesAndTags()
+        {
+            var categories = _context.Categories.ToList();
+            var tags = _context.Tags.ToList();
+            ViewData["tags"] = tags;
+            ViewBag.Categories = new SelectList(categories, "Id", "CategoryName");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var article = _context.Articles.FirstOrDefault(x => x.Id == id);
+            _context.Articles.Remove(article);
+            await _context.SaveChangesAsync();
+            return Redirect("/Admin/Article/Index");
         }
     }
 }
