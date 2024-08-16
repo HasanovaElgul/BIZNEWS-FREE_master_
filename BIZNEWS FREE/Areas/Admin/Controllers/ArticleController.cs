@@ -162,6 +162,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
             _context.Articles.Remove(article);
             await _context.SaveChangesAsync();
             return Redirect("/Admin/Article/Index");
+
         }
 
 
