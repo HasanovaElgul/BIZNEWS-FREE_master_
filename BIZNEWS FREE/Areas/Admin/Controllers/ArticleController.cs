@@ -154,9 +154,16 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var article = _context.Articles.FirstOrDefault(x => x.Id == id);
+            var path = (_env.WebRootPath + article.PhotoUrl).ToLower();         //serverde silinmis fayllari saxlamasin  silsin
+
+            if (System.IO.File.Exists(path))
+                System.IO.File.Delete(path);
+
             _context.Articles.Remove(article);
             await _context.SaveChangesAsync();
             return Redirect("/Admin/Article/Index");
         }
+
+
     }
 }
