@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Security.Claims;
 
 namespace BIZNEWS_FREE.Areas.Admin.Controllers
@@ -165,20 +166,52 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
 
         }
 
+
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            if (id == null) return NotFound();
+            // Найти статью по ID
             var article = await _context.Articles.FindAsync(id);
+
+            // Если статья не найдена, вернуть 404
             if (article == null)
                 return NotFound();
+
+            // Загрузка категорий и тегов для передачи в представление
             var categories = _context.Categories.ToList();
             var tags = _context.Tags.ToList();
+
+            // Передача данных в ViewBag и ViewData
             ViewData["tags"] = tags;
             ViewBag.Categories = new SelectList(categories, "Id", "CategoryName");
 
-            return View();
+            // Передача модели статьи в представление
+            return View(article);
+        }
 
+        //todo Seo, Comment
+        [HttpPost]
+
+        public async Task<IActionResult> Edit(Article article, IFormFile file, List<int> tagIds)             //если где-то произошла ошибка, что выходил список этот
+        {
+            var categories = _context.Categories.ToList();
+            var tags = _context.Tags.ToList();
+
+            ViewData["tags"] = tags;
+
+            // Создаем SelectList для категорий и передаем его в представление
+            ViewBag.Categories = new SelectList(categories, "Id", "CategoryName");
+
+            var findArticle = _context.Articles.FirstOrDefault(X => X.Id == article.Id);
+
+            findArticle.SeoUrl = "";
+            findArticle.Title = article.Title;            //обновление измененной даты
+            findArticle.UpdatedDate = DateTime.Now;
+
+
+
+            return View();
 
         }
     }

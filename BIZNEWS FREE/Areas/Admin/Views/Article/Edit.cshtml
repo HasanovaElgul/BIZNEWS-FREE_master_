@@ -4,7 +4,7 @@
     <!-- Группа для ввода заголовка статьи -->
     <div class="form-group">
         <label asp-for="Title"></label>
-        <input type="text" asp-for="Title" class="form-control" value="" />
+        <input type="text" asp-for="Title" class="form-control"/>
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
     
@@ -38,7 +38,8 @@
     <div class="form-group">
         <input type="file" accept="image/*" name="file" class="form-control" value="" />
         <span asp-validation-for="PhotoUrl" class="text-danger"></span>
-    </div>
+        <img src="@Model.PhotoUrl" width="200" alt="" />
+    </div>                                
 
     <!-- Опции для определенных ролей пользователей -->
     @if (User.IsInRole("Admin editor") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("Manager"))
