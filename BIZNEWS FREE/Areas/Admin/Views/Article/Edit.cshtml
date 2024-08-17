@@ -7,6 +7,7 @@
         <input type="text" asp-for="Title" class="form-control" value="" />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
+    
 
     <!-- Группа для ввода содержания статьи -->
     <div class="form-group">
@@ -53,10 +54,10 @@
     }
 
     <!-- Кнопка для отправки формы -->
-    <input type="submit" class="btn btn-dark" value="Create" />
+    <input type="submit" class="btn btn-dark" value="Update" />
 </form>
 
-@section Script 
+@section Script
 {
     <script src="//cdn.ckeditor.com/4.22.0/standard/ckeditor.js"></script>
     <script>

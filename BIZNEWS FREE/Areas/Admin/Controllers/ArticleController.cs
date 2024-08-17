@@ -165,6 +165,22 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
 
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id == null) return NotFound();
+            var article = await _context.Articles.FindAsync(id);
+            if (article == null)
+                return NotFound();
+            var categories = _context.Categories.ToList();
+            var tags = _context.Tags.ToList();
+            ViewData["tags"] = tags;
+            ViewBag.Categories = new SelectList(categories, "Id", "CategoryName");
 
+            return View();
+
+
+        }
     }
 }
+

@@ -1,10 +1,19 @@
-﻿namespace BIZNEWS_FREE.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BIZNEWS_FREE.Models
 {
+    //Solid
+    //Single Responsibility
+
     public class Article
     {
         internal List<Tag> Tags;
 
+        //[Key]
         public int Id { get; set; }
+        [Required]      //boş göndərmək olmaz
+        [MinLength(5)]
+        [MaxLength(50)]
         public string Title { get; set; }
         public string Content { get; set; }
         public string PhotoUrl { get; set; }
