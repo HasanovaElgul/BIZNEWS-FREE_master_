@@ -107,7 +107,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
                     IsFeature = article.IsFeature,
                     CreatedBy = $"{user.Firstname} {user.Lastname}",
                     SeoUrl = "", // Замените на логику генерации SEO URL
-                    PhotoUrl = await file.SaveFileAsync(_env.WebRootPath, "article-images") // Сохранение загруженного файла
+                    PhotoUrl = await file.SaveFileAsync(_env.WebRootPath, "/article-images/") // Сохранение загруженного файла
                 };
 
                 // Добавление новой статьи в базу данных
@@ -203,15 +203,19 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
             // Создаем SelectList для категорий и передаем его в представление
             ViewBag.Categories = new SelectList(categories, "Id", "CategoryName");
 
-            var findArticle = _context.Articles.FirstOrDefault(X => X.Id == article.Id);
-
-            findArticle.SeoUrl = "";
-            findArticle.Title = article.Title;            //обновление измененной даты
-            findArticle.UpdatedDate = DateTime.Now;
+            var userId = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userManager.FindByIdAsync(userId);
 
 
+            if (file != null)
+                article.PhotoUrl = await file.SaveFileAsync(_env.WebRootPath, "/article-images/");
 
-            return View();
+            article.SeoUrl = "";
+
+
+            _context.Articles.Update(article);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
 
         }
     }
