@@ -32,17 +32,20 @@
     <!-- Группа для выбора тегов статьи -->
     <div class="form-group">
         <select multiple name="tagIds" class="form-control">
-            @foreach (var item in ViewData["tags"] as List<Tag>)
-            {   if (item.ArticleTags.Select(x => x.TagId).Contains(item.Id))
-                {
-                    <option value="@item.Id">@item.TagName</option>
+            @foreach (var item in ViewBag.Tags as List<Tag>)
+               {
+                   if (Model.ArticleTags.Select(x => x.TagId).Contains(item.Id))
+                    {
+                    <option selected value="@item.Id">@item.TagName</option>
                 }
                 else
                 {
-                    <option value="@item.Id">@item.TagName</option>    
+                    <option value="@item.Id">@item.TagName</option>
                 }
-
             }
+               
+
+            
         </select>
     </div>
 

@@ -115,15 +115,14 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
 
                 // Проверка существующих тегов и добавление их к статье
-                var validTagIds = _context.Tags.Where(t => tagIds.Contains(t.Id)).Select(t => t.Id).ToList();
-                foreach (var tagId in validTagIds)
+                for (int i = 0; i < tagIds.Count; i++)
                 {
-                    var articleTag = new ArticleTag
+                    ArticleTag articleTag = new()
                     {
                         ArticleId = newArticle.Id,
-                        TagId = tagId
+                        TagId = tagIds[i]
                     };
-                    _context.ArticleTags.Add(articleTag);
+                    await _context.ArticleTags.AddAsync(articleTag);
                 }
                 await _context.SaveChangesAsync();
 
@@ -172,7 +171,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             // Найти статью по ID
-            var article = await _context.Articles.FindAsync(id);
+            var article = await _context.Articles.Include(X => X.ArticleTags).ThenInclude(X => X.Tag).FirstOrDefaultAsync(x => x.Id == id);
 
             // Если статья не найдена, вернуть 404
             if (article == null)
@@ -183,7 +182,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
             var tags = _context.Tags.ToList();
 
             // Передача данных в ViewBag и ViewData
-            ViewData["tags"] = tags;
+            ViewBag.Tags = tags;
             ViewBag.Categories = new SelectList(categories, "Id", "CategoryName");
 
             // Передача модели статьи в представление
@@ -198,7 +197,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
             var categories = _context.Categories.ToList();
             var tags = _context.Tags.ToList();
 
-            ViewData["tags"] = tags;
+            ViewBag.Tags = tags;
 
             // Создаем SelectList для категорий и передаем его в представление
             ViewBag.Categories = new SelectList(categories, "Id", "CategoryName");
@@ -211,7 +210,24 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
                 article.PhotoUrl = await file.SaveFileAsync(_env.WebRootPath, "/article-images/");
 
             article.SeoUrl = "";
+            article.UpdatedBy = user.Firstname + "" + user.Lastname;
+            article.UpdatedDate = DateTime.Now;
 
+
+            var findTags = _context.ArticleTags.Where(x => x.ArticleId == article.Id).ToList();
+            _context.ArticleTags.RemoveRange(findTags);
+            await _context.SaveChangesAsync();
+
+            for (int i = 0; i < tagIds.Count; i++)
+            {
+                ArticleTag articleTag = new()
+                {
+                    ArticleId = article.Id,
+                    TagId = tagIds[i]
+                };
+                await _context.ArticleTags.AddAsync(articleTag);
+            }
+            await _context.SaveChangesAsync();
 
             _context.Articles.Update(article);
             await _context.SaveChangesAsync();
