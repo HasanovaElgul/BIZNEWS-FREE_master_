@@ -1,8 +1,16 @@
 ﻿@model IEnumerable<BIZNEWS_FREE.Models.Article>
 
+
+    @section Link{
+   
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.4/css/dataTables.dataTables.css" />
+
+   
+    }
+
 <a href="/admin/article/create" class="btn btn-dark btn-block">Create New Article</a>
 
-<table class="table table-hover table-bordered">
+<table id="myTable" class="table table-dark table-striped table-bordered">
     <thead>
         <tr>
             <th>№</th>
@@ -48,3 +56,11 @@
         }
     </tbody>
 </table>
+                       @section Script{
+                              <script src="https://cdn.datatables.net/2.0.5/js/dataTables.js"></script>   
+                           <script>
+                             let table = new DataTable('#myTable');
+                           </script>
+                       }
+
+

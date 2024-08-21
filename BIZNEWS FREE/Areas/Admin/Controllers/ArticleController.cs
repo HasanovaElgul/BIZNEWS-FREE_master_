@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Security.Claims;
+using WebUI.Helper;
 
 namespace BIZNEWS_FREE.Areas.Admin.Controllers
 {
@@ -36,6 +37,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
         {
             // Получение списка статей из базы данных с включением связанных категорий и тегов
             var articles = _context.Articles
+                .Where(x => x.IsDeleted == false)
                 .Include(x => x.Category) // Включаем связанные категории
                 .Include(x => x.ArticleTags) // Включаем связанные теги
                 .ThenInclude(x => x.Tag) // Включаем сами теги
@@ -106,7 +108,7 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
                     IsActive = article.IsActive,
                     IsFeature = article.IsFeature,
                     CreatedBy = $"{user.Firstname} {user.Lastname}",
-                    SeoUrl = "", // Замените на логику генерации SEO URL
+                    SeoUrl = article.Title.ReplaceInvalidChars(),
                     PhotoUrl = await file.SaveFileAsync(_env.WebRootPath, "/article-images/") // Сохранение загруженного файла
                 };
 
@@ -209,7 +211,8 @@ namespace BIZNEWS_FREE.Areas.Admin.Controllers
             if (file != null)
                 article.PhotoUrl = await file.SaveFileAsync(_env.WebRootPath, "/article-images/");
 
-            article.SeoUrl = "";
+
+            article.SeoUrl = article.Title.ReplaceInvalidChars();
             article.UpdatedBy = user.Firstname + "" + user.Lastname;
             article.UpdatedDate = DateTime.Now;
 
