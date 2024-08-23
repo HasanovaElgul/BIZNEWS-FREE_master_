@@ -33,6 +33,8 @@ namespace BIZNEWS_FREE.Controllers
             return View(homeVM);
         }
 
+     
+
         public IActionResult Privacy()
         {
             return View();

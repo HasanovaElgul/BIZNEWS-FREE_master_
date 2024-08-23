@@ -64,7 +64,7 @@ app.UseEndpoints(endpoints =>
 {
 	endpoints.MapControllerRoute(
 	  name: "areas",
-	  pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}"
+	  pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}/{seoUrl?}"
 	);
 });     /////////// Admin panele kecmek ucun /admin
 
@@ -73,6 +73,6 @@ app.UseEndpoints(endpoints =>
 
 app.MapControllerRoute(
 	name: "default",
-	pattern: "{controller=Home}/{action=Index}/{id?}");
+	pattern: "{controller=Home}/{action=Index}/{id?}/{seoUrl?}");
 
 app.Run();
