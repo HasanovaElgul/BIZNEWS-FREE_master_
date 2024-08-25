@@ -17,9 +17,10 @@ namespace BIZNEWS_FREE.Controllers
             var article = _context.Articles
                 .Include(x => x.Category)
                 .Include(x => x.ArticleTags)
-                .Include(x => x.Tags)
+                .ThenInclude(x => x.Tag) // Предполагается, что Tag является свойством в ArticleTags
                 .FirstOrDefault(x => x.Id == id);
             return View(article);
+
         }
 
     }
