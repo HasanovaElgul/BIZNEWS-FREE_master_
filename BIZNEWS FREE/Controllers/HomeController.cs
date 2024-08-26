@@ -23,7 +23,7 @@ namespace BIZNEWS_FREE.Controllers
             var featuredArticles = _context.Articles
                 .Include(x => x.Category)
                 .Where(x => x.IsActive == true && x.IsFeature == false)
-                .OrderByDescending(x => x.UpdatedDate)
+                 .OrderByDescending(x => x.ViewCount)
                 .Take(7).ToList();                           // Берем 7 статей: 3 для основной карусели и 4 для дополнительного блока
 
             var articles = _context.Articles
@@ -34,7 +34,7 @@ namespace BIZNEWS_FREE.Controllers
 
             HomeVM homeVM = new()
             {
-                FeaturedArticles = featuredArticles
+                FeaturedArticles = featuredArticles,
                 Articles = articles
             };
             return View(homeVM);
