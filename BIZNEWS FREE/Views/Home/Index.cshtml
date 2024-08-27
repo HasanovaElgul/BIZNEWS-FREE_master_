@@ -39,28 +39,29 @@
 <!-- Navbar End -->
 <!-- Main News Slider Start -->
 <div class="container-fluid">
-    
+
     <div class="row">
         <div class="col-lg-7 px-0">
 
             <div class="owl-carousel main-carousel position-relative">
 
                 @for (int i = 0; i <= 3 && i < Model.FeaturedArticles.Count; i++)
-                    { <div class="position-relative overflow-hidden" style="height: 500px;">
+                {
+                    <div class="position-relative overflow-hidden" style="height: 500px;">
                         <div class="@(i==0 ? "first" : i == 1 ? "secont" : "last")-overlay">
-                    <img class="img-fluid h-100" src="@Model.FeaturedArticles[i].PhotoUrl" style="object-fit: cover;">
-                    
-                        <div class="mb-2">
-                            <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
+                            <img class="img-fluid h-100" src="@Model.FeaturedArticles[i].PhotoUrl" style="object-fit: cover;">
+
+                            <div class="mb-2">
+                                <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
                                    href="">@Model.FeaturedArticles[i].Category.CategoryName</a>
                                 <a class="text-white" href="">@Model.FeaturedArticles[i].CreatedDate.ToString("MMM dd, yyyy")</a>
-                        </div>
+                            </div>
                             <a class="h2 m-0 text-white text-uppercase font-weight-bold" href="">@Model.FeaturedArticles[i].Title</a>
-                           
+
                         </div>
                     </div>
-                   }
-                   
+                }
+
             </div>
         </div>
 
@@ -69,7 +70,7 @@
             <div class="row mx-0">
 
                 @for (int i = 0; i <= 3 && i < Model.FeaturedArticles.Count; i++)
-                    {
+                {
                     <div class="col-md-6 px-0">
                         <div class="position-relative overflow-hidden" style="height: 250px;">
                             <img class="img-fluid w-100 h-100" src="@Model.FeaturedArticles[i].PhotoUrl" style="object-fit: cover;">
@@ -83,8 +84,8 @@
                             </div>
                         </div>
                     </div>
-                    }
-              
+                }
+
             </div>
         </div>
     </div>
@@ -101,21 +102,21 @@
 
             @for (int i = 0; i <= 10 && i < Model.FeaturedArticles.Count; i++)
             {
-               <div class="position-relative overflow-hidden" style="height: 300px;">
+                <div class="position-relative overflow-hidden" style="height: 300px;">
                     <img class="img-fluid h-100" src="@Model.FeaturedArticles[i].PhotoUrl" style="object-fit: cover;">
-                <div class="overlay">
-                    <div class="mb-2">
-                        <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
+                    <div class="overlay">
+                        <div class="mb-2">
+                            <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
                                href="">@Model.FeaturedArticles[i].Category.CategoryName</a>
                             <a class="text-white" href=""><small>@Model.FeaturedArticles[i].CreatedDate.ToString("dd/MM/yyyy")</small></a>
-                    </div>
+                        </div>
                         <a class="h6 m-0 text-white text-uppercase font-weight-semi-bold" href="">@Model.FeaturedArticles[i].Title</a>
+                    </div>
                 </div>
-            </div> 
-                
+
             }
-            
-          
+
+
         </div>
     </div>
 </div>
@@ -145,11 +146,11 @@
                                            href="">@Model.FeaturedArticles[i].Category.CategoryName</a>
                                         <a class="text-body" href=""><small>@Model.FeaturedArticles[i].CreatedDate.ToString("dd MMMM yyyy г. H:mm", new CultureInfo("aze"))</small></a>
                                     </div>
-                                    <a class="h4 d-block mb-3 text-secondary text-uppercase font-weight-bold" href="">@Model.FeaturedArticles[i].Title</a>
+                                    <a class="h4 d-block mb-3 text-secondary text-uppercase font-weight-bold" href="/article/detail/@Model.Articles[i].Id/@Model.Articles[i].SeoUrl">@Model.FeaturedArticles[i].Title</a>
                                     <p class="m-0">
                                         @Html.Raw(Model.FeaturedArticles[i].Content.Length > 100
                                                  ? Model.FeaturedArticles[i].Content.Substring(0, 100) + "..."      //если длина текста больше 100 символов, берется первые 100 символов, и добавляется многоточие.  Если текст короче или равен 100 символам, он отображается полностью.
-                                                 : Model.FeaturedArticles[i].Content)         
+                                                 : Model.FeaturedArticles[i].Content)
                                     </p>
 
                                 </div>
@@ -165,14 +166,14 @@
                                 </div>
                             </div>
                         }
-                      
-   
+
+
                     </div>
-                    
-                   
-        
-                 
-                 
+
+
+
+
+
 
 
 
@@ -198,7 +199,7 @@
                                         rebum clita rebum dolor stet amet justo
                                     </p>
                                 </div>
-                                
+
                                 <div class="d-flex justify-content-between bg-white border-top mt-auto p-4">
                                     <div class="d-flex align-items-center">
                                         <img class="rounded-circle mr-2" src="~/img/user.jpg" width="25" height="25" alt="">
@@ -214,45 +215,45 @@
                     </div>
                     <div class="col-lg-6">
 
-                        @for (int i = 0; i < Model.Articles.Count && i < 4; i++)
-                            {                                            
+                        @for (int i = 0; i < Model.FeaturedArticles.Count && i < 4; i++)
+                        {
                             if (i % 2 == 0) // Отображаем статьи с четными индексами в первом столбце
-                                {
+                            {
                                 <div class="d-flex align-items-center bg-white mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                                     <img class="img-fluid" src="@Model.FeaturedArticles[i].PhotoUrl" alt="">
-                            <div class="w-100 h-100 px-3 d-flex flex-column justify-content-center border border-left-0">
-                                <div class="mb-2">
+                                    <div class="w-100 h-100 px-3 d-flex flex-column justify-content-center border border-left-0">
+                                        <div class="mb-2">
                                             <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2" href="">@Model.FeaturedArticles[i].Category.CategoryName</a>
                                             <a class="text-body" href=""><small>@Model.FeaturedArticles[i].CreatedDate.ToString("dd MMMM yyyy г.", new CultureInfo("aze"))</small></a>
-                                </div>
+                                        </div>
                                         <a class="h6 m-0 text-secondary text-uppercase font-weight-bold" href="/article/detail/@Model.FeaturedArticles[i].Id">@Model.FeaturedArticles[i].Title</a>
-                            </div>
+                                    </div>
                                 </div>
-                                }
-                               
                             }
-    
+
+                        }
+
                     </div>
 
-                        <div class="col-lg-6">
-                        @for (int i = 2; i < Model.Articles.Count && i < 6; i++)
+                    <div class="col-lg-6">
+                        @for (int i = 2; i < Model.FeaturedArticles.Count && i < 6; i++)
                         {
                             if (i % 2 != 0) // Отображаем статьи с нечетными индексами во втором столбце
                             {
                                 <div class="d-flex align-items-center bg-white mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                                     <img class="img-fluid" src="@Model.FeaturedArticles[i].PhotoUrl" alt="">
-                            <div class="w-100 h-100 px-3 d-flex flex-column justify-content-center border border-left-0">
-                                <div class="mb-2">
+                                    <div class="w-100 h-100 px-3 d-flex flex-column justify-content-center border border-left-0">
+                                        <div class="mb-2">
                                             <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2" href="">@Model.FeaturedArticles[i].Category.CategoryName</a>
                                             <a class="text-body" href=""><small>@Model.FeaturedArticles[i].CreatedDate.ToString("dd MMMM yyyy г.", new CultureInfo("aze"))</small></a>
-                                </div>
+                                        </div>
                                         <a class="h6 m-0 text-secondary text-uppercase font-weight-bold" href="/article/detail/@Model.FeaturedArticles[i].Id">@Model.FeaturedArticles[i].Title</a>
-                            </div>
-                        </div>
+                                    </div>
+                                </div>
                             }
                         }
-                       
-                     
+
+
                     </div>
                 </div>
             </div>
@@ -383,18 +384,16 @@
                         <h4 class="m-0 text-uppercase font-weight-bold">Tags</h4>
                     </div>
                     <div class="bg-white border border-top-0 p-3">
-                        <div class="d-flex flex-wrap m-n1">
-                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Politics</a>
-                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Business</a>
-                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Corporate</a>
-                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Business</a>
-                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Health</a>
-                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Education</a>
-                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Science</a>
-                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Business</a>
-                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Foods</a>
-                            <a href="" class="btn btn-sm btn-outline-secondary m-1">Travel</a>
-                        </div>
+                        @for (int i = 0; i < Model.FeaturedArticles.Count; i++)
+                        {
+                            <div class="d-flex flex-wrap m-n1">
+
+                                <a href="" class="btn btn-sm btn-outline-secondary m-1">@Model.FeaturedArticles[i].Category.CategoryName</a>
+
+                            </div>
+                        }
+
+
                     </div>
                 </div>
                 <!-- Tags End -->
