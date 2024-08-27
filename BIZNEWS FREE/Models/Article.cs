@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BIZNEWS_FREE.Models
-{
+namespace BIZNEWS_FREE.Models;
+  
+
+
     //Solid
     //Single Responsibility
 
@@ -31,4 +33,3 @@ namespace BIZNEWS_FREE.Models
         public string SeoUrl { get; set; } //sayti axtarisda qabağa cekmek
 
     }
-}

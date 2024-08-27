@@ -1,5 +1,9 @@
 ﻿@using System.Globalization
+
 @model HomeVM
+
+
+
 
 <!-- Navbar Start -->
 <div class="container-fluid p-0">
@@ -56,7 +60,7 @@
                                    href="">@Model.FeaturedArticles[i].Category.CategoryName</a>
                                 <a class="text-white" href="">@Model.FeaturedArticles[i].CreatedDate.ToString("MMM dd, yyyy")</a>
                             </div>
-                            <a class="h2 m-0 text-white text-uppercase font-weight-bold" href="">@Model.FeaturedArticles[i].Title</a>
+                            <a class="h2 m-0 text-white text-uppercase font-weight-bold" href="/article/detail/@Model.FeaturedArticles[i].Id/@Model.FeaturedArticles[i]">@Model.FeaturedArticles[i].Title</a>
 
                         </div>
                     </div>
@@ -133,10 +137,9 @@
                             <a class="text-secondary font-weight-medium text-decoration-none" href="">View All</a>
                         </div>
                     </div>
+                    
                     <div class="col-lg-6">
-
-
-                        @for (int i = 0; i <= 3 && i < Model.FeaturedArticles.Count; i++)
+                           @for (int i = 0; i <= 3 && i < Model.FeaturedArticles.Count; i++)
                         {
                             <div class="position-relative mb-3">
                                 <img class="img-fluid w-100" src="@Model.FeaturedArticles[i].PhotoUrl" style="object-fit: cover;">
@@ -247,7 +250,7 @@
                                             <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2" href="">@Model.FeaturedArticles[i].Category.CategoryName</a>
                                             <a class="text-body" href=""><small>@Model.FeaturedArticles[i].CreatedDate.ToString("dd MMMM yyyy г.", new CultureInfo("aze"))</small></a>
                                         </div>
-                                        <a class="h6 m-0 text-secondary text-uppercase font-weight-bold" href="/article/detail/@Model.FeaturedArticles[i].Id">@Model.FeaturedArticles[i].Title</a>
+                                        <a class="h6 m-0 text-secondary text-uppercase font-weight-bold" href="/article/detail/@Model.Articles[i].Id">@Model.FeaturedArticles[i].Title</a>
                                     </div>
                                 </div>
                             }

@@ -19,26 +19,29 @@ namespace BIZNEWS_FREE.Controllers
         }
 
         public IActionResult Index()
-        {
-            var featuredArticles = _context.Articles
-                .Include(x => x.Category)
-                .Where(x => x.IsActive == true && x.IsFeature == false)
-                 .OrderByDescending(x => x.ViewCount)
-                .Take(7).ToList();                           // Берем 7 статей: 3 для основной карусели и 4 для дополнительного блока
+{
+    var featuredArticles = _context.Articles
+        .Include(x => x.Category)
+        .Where(x => x.IsActive == true && x.IsFeature == false)
+        .OrderByDescending(x => x.ViewCount)
+        .Take(7)
+        .ToList();
 
-            var articles = _context.Articles
-                .Include(x => x.Category)
-                .Where(x => x.IsDeleted == false)
-                .OrderByDescending(x => x.UpdatedDate)
-                .ToList();
+    var articles = _context.Articles
+        .Include(x => x.Category)
+        .Where(x => x.IsDeleted == false)
+        .OrderByDescending(x => x.UpdatedDate)
+        .ToList();
 
-            HomeVM homeVM = new()
-            {
-                FeaturedArticles = featuredArticles,
-                Articles = articles
-            };
-            return View(homeVM);
-        }
+    HomeVM homeVM = new()
+    {
+        FeaturedArticles = featuredArticles,
+        Articles = articles
+    };
+
+    return View(homeVM);
+}
+
 
 
 
@@ -47,10 +50,6 @@ namespace BIZNEWS_FREE.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        
     }
 }
